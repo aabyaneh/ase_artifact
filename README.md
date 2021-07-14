@@ -86,15 +86,15 @@ To run the ASE engine on a set of benchmarks do the following.
 ## Reproduction of the results:
 After successfully installing the ASE tool, you see `ase`, `parti`, and `selfie` executables inside the *ase_artifact* folder.
 
-To reproduced the result of the paper, run the following script:
+To reproduce the results of the paper, run the following script:
 ```
 run_all.sh
 ```
-which runs the tool on the benchmarks mentioned in the paper. When the execution of the scrip is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
+which runs the tool on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
 
-**IMPORTANT**. Since we are reporting the execution-time in the Figure 5 of the paper, depending on the machine which the experiments are executed the results may vary. So, do not expect the same execution-time as Figure 5 when executing the benchmarks.
+**IMPORTANT**. Since we are reporting the execution time in Figure 5 of the paper, depending on the machine which the experiments are executed the results may vary. So, do not expect the same execution time as Figure 5 when executing the benchmarks.
 
-**IMPORTANT**. Since we are reporting the execution-time, it is very important that the machine which the experiment are running on have enough resources (no racing, no virtual machine). Otherwise, the generated result will not be reliable.
+**IMPORTANT**. Since we are reporting the execution time, it is very important that the machine which the experiment are running on has enough resources (no racing, no virtual machine). Otherwise, the generated result will not be reliable.
 
 **IMPORTANT**. The execution of the experiment might take a long time. Therefore, we provided another script called
 ```
@@ -126,7 +126,7 @@ Once you have written a program in C*, first the input program should be compile
 ./selfie -c code.c -o binary
 ```
 
-Then, the generated binary should be passed to the ASE engine as input by using `-l` flag. You can use the following commands to run the ASE approaches mentioned in the experimental evaluation of the paper:
+Then, the generated binary should be passed to the ASE engine as input by using the `-l` flag. You can use the following commands to run the ASE approaches mentioned in the experimental evaluation of the paper:
 
 - ASE (O1):
 ```
@@ -161,7 +161,7 @@ uint64_t main() {
 }
 ```
 
-You can run the following command to symbolically execute the program:
+You can run the following command to execute the program symbolically:
 - ASE (O1):
 ```
 ./ase -l binary -pvi_ubox_bvt 1
