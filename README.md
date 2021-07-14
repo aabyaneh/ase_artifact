@@ -36,9 +36,9 @@ In this section we explain how to run the ASE engine on a set of benchmarks.
 - [Boolector](https://boolector.github.io/) version 3.2.1 with CaDiCaL SAT solver.
 - GCC and G++ version 9.3.
 
-**IMPORTANT**. Since we are reporting the execution times, it is important that the machine on which the experiments are running has enough resources (no resource racing). Otherwise, the generated execution times will not be accurate.
+**IMPORTANT**. Since we are reporting execution times, it is important that the machine on which the experiments are running has enough resources. Otherwise, the generated execution times will not be accurate.
 
-**IMPORTANT**. Moreover, running the experiments on a virtual machine (docker, virtualbox, etc.) will not produce accurate execution times. For reproducing (relative) execution time measurements, you need to install the code natively on a real linux machine.
+**IMPORTANT**. Moreover, running the experiments on a virtual machine (docker, virtualbox, etc.) will not produce accurate execution times. For reproducing (relative) execution time measurements, you need to install the code natively on a real Linux machine.
 
 ### Reproduction of the results
 After successfully installing the ASE engine, you see `ase`, `parti`, and `selfie` executables inside the *ase_artifact* folder.
