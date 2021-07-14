@@ -1,7 +1,7 @@
 # How to install the ASE engine
 In this section we explain how to install the ASE engine.
 
-**IMPORTANT**. Please make sure that the machine on which the installation is done has enough resources (at least 8 GB of RAM, and 2 CPUs). Since we measure the execution times please make sure that there is no resource racing while executing the experiments.
+**IMPORTANT**. Please make sure that the machine on which the installation is done has enough resources (at least 8 GB of RAM, and 2 CPU cores). Since we measure execution times please make sure that there is sufficient resources while executing the experiments.
 
 **IMPORTANT**. We provide the docker image for convenience. For reproducing (relative) execution time measurements, you need to install the engine natively on a real machine. Otherwise, the generated execution times will not be accurate.
 
