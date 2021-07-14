@@ -21,14 +21,14 @@ uint64_t main() {
   return 0;
 }
 ```
-A aymbolic value in this program is determined by `interval(&a, 0, 100, 1)`which assigns integer value interval of `<0, 100, 1>` (values from 0 to 1000 with step 1) to memory address `&a`.
+A symbolic value in this program is determined by `interval(&a, 0, 100, 1)`which assigns integer value interval of `<0, 100, 1>` (values from 0 to 1000 with step 1) to memory address `&a`.
 
 This program is first compiled into a subset of RISC-V using the compiler provided in the `compiler` folder. Then, the generated binary can be analyzed by the ASE engine symbolically and witnesses for each path of the program can be printed.
 
 # How to install the ASE engine
 
 ## Install on a Linux machine:
-Exceute the following commands in a terminal:
+Execute the following commands in a terminal:
 ```
 1. sudo apt-get update ;
 2. sudo apt-get install -y --no-install-recommends \
@@ -57,26 +57,26 @@ Go to the root directory of the artifact (i.e. ase_artifact folder) and then:
 5. cd .. ;
 6. make all;
 ```
-Now you in the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
+Now you should see in the *ase_artifact* folder `ase`, `parti`, and `selfie` executables.
 
 ## Install on docker (by building docker image locally)
 1. download and install docker on your machine
 2. run docker
-3. **IMPORTANT:** go to docker settings, and then in "Resourses" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
+3. **IMPORTANT:** go to docker settings, and then in "Resources" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
 4. go to the root directory of the artifact (i.e. ase_artifact folder) where "Dockerfile" is located
 5. open a terminal
-6. exceute the following command: `docker build --tag ase_artifact .`
-7. then exceute the following command: `docker run -it ase_artifact`
+6. execute the following command: `docker build --tag ase_artifact .`
+7. then execute the following command: `docker run -it ase_artifact`
 
 Now you should be able to see the *ase_artifact* folder by executing `ls` command. In the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
 
 ## Install on docker (by pulling from the Docker Hub)
 1. download and install docker on your machine
 2. run docker
-3. **IMPORTANT:** go to docker settings, and then in "Resourses" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
+3. **IMPORTANT:** go to docker settings, and then in "Resources" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
 4. open a terminal
-5. exceute `docker pull aabyaneh/ase_artifact`
-6. exceute the following command: `docker run -it aabyaneh/ase_artifact`
+5. execute `docker pull aabyaneh/ase_artifact`
+6. execute the following command: `docker run -it aabyaneh/ase_artifact`
 
 Now you should be able to see the *ase_artifact* folder by executing `ls` command. In the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
 
