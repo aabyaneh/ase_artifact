@@ -105,7 +105,7 @@ which executes the reported approaches in Figure 5 of the paper for a randomly c
 ## General Usage:
 In the root folder (i.e. ase_artifact) you should see `ase`, `parti`, and `selfie` executables.
 
-The engine can analyze the programs which are written in [C*](https://github.com/cksystemsteaching/selfie) programming language. You can see the available benchmarks in `benchmarks` folder. For more information about C* check https://github.com/cksystemsteaching/selfie.
+The engine can analyze programs written in the [C*](https://github.com/cksystemsteaching/selfie) programming language. You can see the available benchmarks in `benchmarks` folder. For more information about C* refer to https://github.com/cksystemsteaching/selfie.
 
 A symbolic value can be defined as `interval(memory address, lower bound, upper bound, step)`, for example:
 ```
@@ -119,7 +119,6 @@ b = malloc(10 * 8);
 interval(b, 0, 1000, 1);
 ```
 where `interval(b, 0, 1000, 1)`assigns integer value interval of `<0, 1000, 1>` (values from 0 to 1000 with step 1) to memory address `b`.
-
 
 Once you have written a program in C*, first the input program should be compiled to binary using the command below:
 ```
