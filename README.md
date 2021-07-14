@@ -21,80 +21,33 @@ uint64_t main() {
   return 0;
 }
 ```
-A symbolic value in this program is determined by `interval(&a, 0, 100, 1)`which assigns integer value interval of `<0, 100, 1>` (values from 0 to 1000 with step 1) to memory address `&a`.
+A symbolic value in this program is determined by `interval(&a, 0, 100, 1)` which assigns integer value interval of `<0, 100, 1>` (values from 0 to 100 with step 1) to memory address `&a`.
 
-This program is first compiled into a subset of RISC-V using the compiler provided in the `compiler` folder. Then, the generated binary can be analyzed by the ASE engine symbolically and witnesses for each path of the program can be printed.
+This program is first compiled into a subset of RISC-V using the compiler provided in the `compiler` folder. Then, the generated binary can be analyzed by the ASE engine symbolically and witnesses for each path of the program can be printed at each endpoint of the program.
 
-# How to install the ASE engine
+## How to install the ASE engine:
+Please check `INSTALL.md` file.
 
-## Install on a Linux machine:
-Execute the following commands in a terminal:
-```
-1. sudo apt-get update ;
-2. sudo apt-get install -y --no-install-recommends \
-       ca-certificates \
-       cmake \
-       g++ \
-       gcc \
-       git \
-       libc-dev \
-       make \
-       wget \
-       curl ;
+## How to run the experiments:
+In this section we explain how to run the ASE engine on a set of benchmarks.
 
-```
-Go to the root directory of the artifact (i.e. ase_artifact folder) and then:
-```
-3. git clone https://github.com/Boolector/boolector ;
-4. cd boolector \
-  && git checkout 4999474f4e717c206577fd2b1549bd4a9f4a36e7 \
-  && ./contrib/setup-cadical.sh \
-  && ./contrib/setup-btor2tools.sh \
-  && ./configure.sh --only-cadical  \
-  && cd build \
-  && make ;
+### Platform we used
+We ran our experiments on a 512GB NUMA machine with four 16-core 2.3 GHz AMD Opteron 6376 processors (16KB L1 data cache, 64KB L1 instruction cache, 16MB L2 cache, 16MB L3 cache) and Linux kernel version 4.15. For our experiments, we used [Boolector](https://boolector.github.io/) version 3.2.1 which is one of the most efficient SMT solvers for theory of bit-vectors. In the configuration we set CaDiCaL as backend SAT solver of Boolector. For all the experiments the incremental mode of Boolector was enabled. We used GCC and G++ version 9.3 to build Boolector SMT solver and compile our implemented ASE engine source code.
 
-5. cd .. ;
-6. make all;
-```
-Now you should see in the *ase_artifact* folder `ase`, `parti`, and `selfie` executables.
+**IMPORTANT**. Since we are reporting the execution times, it is important that the machine on which the experiments are running has enough resources (no resource racing). Otherwise, the generated execution times will not be accurate.
 
-## Install on docker (by building docker image locally)
-1. download and install docker on your machine
-2. run docker
-3. **IMPORTANT:** go to docker settings, and then in "Resources" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
-4. go to the root directory of the artifact (i.e. ase_artifact folder) where "Dockerfile" is located
-5. open a terminal
-6. execute the following command: `docker build --tag ase_artifact .`
-7. then execute the following command: `docker run -it ase_artifact`
+**IMPORTANT**. Moreover, running the experiments on a virtual machine (docker, virtualbox, etc.) will not produce accurate execution times. For reproducing (relative) execution time measurements, you need to install the code natively on a real linux machine.
 
-Now you should be able to see the *ase_artifact* folder by executing `ls` command. In the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
-
-## Install on docker (by pulling from the Docker Hub)
-1. download and install docker on your machine
-2. run docker
-3. **IMPORTANT:** go to docker settings, and then in "Resources" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2
-4. open a terminal
-5. execute `docker pull aabyaneh/ase_artifact`
-6. execute the following command: `docker run -it aabyaneh/ase_artifact`
-
-Now you should be able to see the *ase_artifact* folder by executing `ls` command. In the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
-
-# How to execute
-To run the ASE engine on a set of benchmarks do the following.
-
-## Reproduction of the results:
-After successfully installing the ASE tool, you see `ase`, `parti`, and `selfie` executables inside the *ase_artifact* folder.
+### Reproduction of the results
+After successfully installing the ASE engine, you see `ase`, `parti`, and `selfie` executables inside the *ase_artifact* folder.
 
 To reproduce the results of the paper, run the following script:
 ```
 run_all.sh
 ```
-which runs the tool on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
+which runs the engine on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
 
 **IMPORTANT**. Since we are reporting the execution times in Figure 5 of the paper, depending on the machine which the experiments are executed on the results may vary. So, do not expect the same execution times as in Figure 5 when executing the benchmarks.
-
-**IMPORTANT**. Since we are reporting execution times, it is very important that the machine which the experiments are running on has enough resources (no swapping, no virtual machine). Otherwise, the generated results will not be accurate.
 
 **IMPORTANT**. The execution of the experiment might take a long time. Therefore, we provide another script called
 ```
@@ -103,22 +56,20 @@ run_random.sh
 which executes the reported approaches in Figure 5 of the paper for a randomly chosen benchmark. The result will be copied to `output.csv`.
 
 ## General Usage:
-In the root folder (i.e. ase_artifact) you should see `ase`, `parti`, and `selfie` executables.
-
 The engine can analyze programs written in the [C*](https://github.com/cksystemsteaching/selfie) programming language. You can see the available benchmarks in `benchmarks` folder. For more information about C* refer to https://github.com/cksystemsteaching/selfie.
 
-A symbolic value can be defined as `interval(memory address, lower bound, upper bound, step)`, for example:
+A symbolic value can be defined as `interval(memory_address, lower_bound, upper_bound, step)`, for example:
 ```
 uint64_t a;
 interval(&a, 0, 1000, 1);
 ```
-where `interval(&a, 0, 1000, 1)`assigns integer value interval of `<0, 1000, 1>` (values from 0 to 1000 with step 1) to memory address `&a`.
+where `interval(&a, 0, 1000, 1)` assigns integer value interval of `<0, 1000, 1>` (values from 0 to 1000 with step 1) to memory address `&a`.
 ```
 uint64_t b;
 b = malloc(10 * 8);
 interval(b, 0, 1000, 1);
 ```
-where `interval(b, 0, 1000, 1)`assigns integer value interval of `<0, 1000, 1>` (values from 0 to 1000 with step 1) to memory address `b`.
+where `interval(b, 0, 1000, 1)` assigns integer value interval of `<0, 1000, 1>` (values from 0 to 1000 with step 1) to memory address `b`.
 
 Once you have written a program in C*, first the input program should be compiled to binary using the command below:
 ```
