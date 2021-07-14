@@ -92,11 +92,11 @@ run_all.sh
 ```
 which runs the tool on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
 
-**IMPORTANT**. Since we are reporting the execution time in Figure 5 of the paper, depending on the machine which the experiments are executed the results may vary. So, do not expect the same execution time as Figure 5 when executing the benchmarks.
+**IMPORTANT**. Since we are reporting the execution times in Figure 5 of the paper, depending on the machine which the experiments are executed on the results may vary. So, do not expect the same execution times as in Figure 5 when executing the benchmarks.
 
-**IMPORTANT**. Since we are reporting the execution time, it is very important that the machine which the experiment are running on has enough resources (no racing, no virtual machine). Otherwise, the generated result will not be reliable.
+**IMPORTANT**. Since we are reporting execution times, it is very important that the machine which the experiments are running on has enough resources (no swapping, no virtual machine). Otherwise, the generated results will not be accurate.
 
-**IMPORTANT**. The execution of the experiment might take a long time. Therefore, we provided another script called
+**IMPORTANT**. The execution of the experiment might take a long time. Therefore, we provide another script called
 ```
 run_random.sh
 ```
