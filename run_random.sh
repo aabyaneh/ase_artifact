@@ -4,7 +4,7 @@ TEMPFILE=$(pwd)/count.tmp
 echo 0 > $TEMPFILE
 
 rand=$((1 + $RANDOM % 31 ))
-echo $rand
+
 FILES=$(pwd)/benchmarks/*.c
 for f in $FILES
 do

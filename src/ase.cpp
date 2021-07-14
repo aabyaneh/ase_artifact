@@ -5,25 +5,7 @@
   selfie.cs.uni-salzburg.at
 */
 
-#include "pvi_ubox_bvt_engine.hpp"
-#include "bvt_engine.hpp"
-#include <sys/time.h>
-#include <thread>
-#include <chrono>
-
-engine*  current_engine;
-uint64_t EXITCODE_BADARGUMENTS = 1;
-
-struct timeval symbolic_execution_begin;
-struct timeval symbolic_execution_end;
-double time_elapsed_in_mcseconds;
-double time_elapsed_in_seconds;
-std::ofstream output_csv;
-std::string file_name;
-std::string method_name;
-
-uint64_t timeout = 120;
-uint64_t timeout_check_step = 1;
+#include "ase.hpp"
 
 void run_timeout_thread() {
   uint64_t elapsed_time = 0;
@@ -114,7 +96,7 @@ uint64_t run() {
 
   current_engine->set_SP(current_engine->current_context);
 
-  std::cout << current_engine->exe_name << ": engine executing " << current_engine->binary_name << " with " << (int64_t) (current_engine->page_frame_memory / current_engine->MEGABYTE) << "MB physical memory \n\n";
+  std::cout << current_engine->exe_name << ": engine executing " << current_engine->binary_name << "\n\n";
 
   try {
     exit_code = current_engine->run_engine(current_engine->current_context);
@@ -152,10 +134,6 @@ uint64_t run() {
 // -----------------------------------------------------------------------------
 // ---------------------------------- MAIN -------------------------------------
 // -----------------------------------------------------------------------------
-
-int    _argc    = 0;
-char** _argv    = (char**) 0;
-char*  exe_name = (char*) 0;
 
 int number_of_remaining_arguments() {
   return _argc;
@@ -252,7 +230,7 @@ int main(int argc, char* argv[]) {
       return run();
     } else if (!strcmp(option, "-bvt")) {
       method_name = "baseline";
-      current_engine = new bvt_engine();
+      current_engine = new bvt_engine(max_trace_length);
       current_engine->exe_name = exe_name;
       current_engine->init_engine(running_arg);
       current_engine->selfie_load(load_file_name);
@@ -261,7 +239,7 @@ int main(int argc, char* argv[]) {
     }
     else if (!strcmp(option, "-pvi_bvt")) {
       method_name = "pvi_bvt";
-      current_engine = new pvi_bvt_engine();
+      current_engine = new pvi_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs);
       current_engine->exe_name = exe_name;
       current_engine->init_engine(running_arg);
       current_engine->selfie_load(load_file_name);
@@ -285,7 +263,7 @@ int main(int argc, char* argv[]) {
       method_name = "ASE (O";
       method_name.append((running_arg == 1 ? "1" : "2"));
       method_name.append(")");
-      current_engine = new pvi_ubox_bvt_engine();
+      current_engine = new pvi_ubox_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs);
       current_engine->exe_name = exe_name;
       current_engine->init_engine(running_arg);
       current_engine->selfie_load(load_file_name);

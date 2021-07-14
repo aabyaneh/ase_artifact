@@ -2,6 +2,21 @@
 
 // ------------------------------ INITIALIZATION -------------------------------
 
+pvi_ubox_bvt_engine::pvi_ubox_bvt_engine() {
+  
+}
+
+pvi_ubox_bvt_engine::pvi_ubox_bvt_engine(uint64_t max_trace_length, uint64_t max_number_of_intervals, uint64_t max_number_of_involved_inputs) {
+  if (max_trace_length > MAX_TRACE_LENGTH)
+    MAX_TRACE_LENGTH = max_trace_length;
+
+  if (max_number_of_intervals > MAX_NUM_OF_INTERVALS)
+    MAX_NUM_OF_INTERVALS = max_number_of_intervals;
+
+  if (max_number_of_involved_inputs > MAX_NUM_OF_INVOLVED_INPUTS)
+    MAX_NUM_OF_INVOLVED_INPUTS = max_number_of_involved_inputs;
+}
+
 void pvi_ubox_bvt_engine::init_engine(uint64_t peek_argument) {
   which_observation = peek_argument != -1 ? peek_argument : which_observation;
 

@@ -1,7 +1,7 @@
 #!/bin/sh
 
-apt-get update ;
-apt-get install -y --no-install-recommends \
+sudo apt-get update ;
+sudo apt-get install -y --no-install-recommends \
        ca-certificates \
        cmake \
        g++ \
@@ -12,9 +12,6 @@ apt-get install -y --no-install-recommends \
        wget \
        curl ;
 
-g++ --version ;
-gcc --version ;
-
 git clone https://github.com/Boolector/boolector ;
 cd boolector \
   && git checkout 4999474f4e717c206577fd2b1549bd4a9f4a36e7 \
@@ -24,5 +21,5 @@ cd boolector \
   && cd build \
   && make ;
 
-cd .. ;
+cd .. ; cd .. ;
 make all;

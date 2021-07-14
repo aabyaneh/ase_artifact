@@ -22,6 +22,15 @@ void bvt_engine::merge_arrays(std::vector<uint64_t>& vector_1, std::vector<uint6
   }
 }
 
+bvt_engine::bvt_engine() {
+
+}
+
+bvt_engine::bvt_engine(uint64_t max_trace_length) {
+  if (max_trace_length > MAX_TRACE_LENGTH)
+    MAX_TRACE_LENGTH = max_trace_length;
+}
+
 void bvt_engine::init_engine(uint64_t peek_argument) {
   init_library();
   init_interpreter();
