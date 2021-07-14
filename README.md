@@ -126,3 +126,11 @@ You can run the following command to execute the program symbolically:
 ```
 ./ase -l binary -bvt
 ```
+
+#### Configuration parameters:
+To run the engine on very large input programs you may need to increase the configuration parameters in `ase.hpp` and `se.hpp` files of the source code and then rebuild the source code:
+
+- max_trace_length: the maximum length of the trace used by the engine.
+- max_number_of_intervals: the maximum number of value intervals used to represent the set of values for a variable.
+
+To reproduce the results of the paper you do not need to change these configuration parameters.
