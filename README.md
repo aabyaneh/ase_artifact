@@ -32,7 +32,9 @@ Please check `INSTALL.md` file.
 In this section we explain how to run the ASE engine on a set of benchmarks.
 
 ### Platform we used
-We ran our experiments on a 512GB NUMA machine with four 16-core 2.3 GHz AMD Opteron 6376 processors (16KB L1 data cache, 64KB L1 instruction cache, 16MB L2 cache, 16MB L3 cache) and Linux kernel version 4.15. For our experiments, we used [Boolector](https://boolector.github.io/) version 3.2.1 which is one of the most efficient SMT solvers for theory of bit-vectors. In the configuration we set CaDiCaL as backend SAT solver of Boolector. For all the experiments the incremental mode of Boolector was enabled. We used GCC and G++ version 9.3 to build Boolector SMT solver and compile our implemented ASE engine source code.
+- A 512GB NUMA machine with four 16-core 2.3 GHz AMD Opteron 6376 processors (16KB L1 data cache, 64KB L1 instruction cache, 16MB L2 cache, 16MB L3 cache) and Linux kernel version 4.15.
+- [Boolector](https://boolector.github.io/) version 3.2.1 with CaDiCaL SAT solver.
+- GCC and G++ version 9.3.
 
 **IMPORTANT**. Since we are reporting the execution times, it is important that the machine on which the experiments are running has enough resources (no resource racing). Otherwise, the generated execution times will not be accurate.
 
