@@ -51,7 +51,7 @@ In this section we explain how to run the ASE engine on using docker.
 
 Now you should be able to see the *ase_artifact* folder by executing `ls` command. In the *ase_artifact* folder you should see `ase`, `parti`, and `selfie` executables.
 
-## Install on docker (by pulling from the Docker Hub)
+### Install on docker (by pulling from the Docker Hub)
 1. download and install docker on your machine
 2. run docker
 3. **IMPORTANT:** go to docker settings, and then in "Resources" tab: increase the **"Memory"** to at least **'8 GB'** and "CPUs" to 2

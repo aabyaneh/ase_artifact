@@ -1,5 +1,7 @@
 # Abstract Symbolic Execution (ASE) Engine
 
+This is the artifact for the paper *ASE: A Value Set Decision Procedure for Symbolic Execution* by Alireza S. Abyaneh and Christoph M. Kirsch published at ASE 2021.
+
 ASE is a symbolic execution engine which works on a subset of RISC-V (compiled from [C*](https://github.com/cksystemsteaching/selfie) programming language). The engine uses a decision procedure which is based on *strided value interval* abstraction domain and *bit-vectors*.
 
 Here is a program written in C*:
@@ -36,7 +38,7 @@ In this section we explain how to run the ASE engine on a set of benchmarks.
 - [Boolector](https://boolector.github.io/) version 3.2.1 with CaDiCaL SAT solver.
 - GCC and G++ version 9.3.
 
-**IMPORTANT**. Since we are reporting execution times, it is important that the machine on which the experiments are running has enough resources. Otherwise, the generated execution times will not be accurate.
+**IMPORTANT**. Since we are reporting execution times, it is important that the machine on which the experiments are running has enough resources (at least 8 GB of RAM, and 2 CPU cores). Otherwise, the generated execution times will not be accurate.
 
 **IMPORTANT**. Moreover, running the experiments on a virtual machine (docker, virtualbox, etc.) will not produce accurate execution times. For reproducing (relative) execution time measurements, you need to install the code natively on a real Linux machine.
 
@@ -47,15 +49,15 @@ To reproduce the results of the paper, run the following script:
 ```
 run_all.sh
 ```
-which runs the engine on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data for Figure 5 of the paper can be found in the `output.csv` file.
+which runs the engine on the benchmarks mentioned in the paper. When the execution of the script is finished, you can find the generated `output.csv` file inside *ase_artifact* folder. The data in the `output.csv` file corresponds to the data reported in the ASE paper.
 
-**IMPORTANT**. Since we are reporting the execution times in Figure 5 of the paper, depending on the machine which the experiments are executed on the results may vary. So, do not expect the same execution times as in Figure 5 when executing the benchmarks.
+**IMPORTANT**. Since we are reporting the execution times in the ASE paper, depending on the machine which the experiments are executed on the results may vary. So, do not expect the same execution times as in the ASE paper when executing the benchmarks.
 
 **IMPORTANT**. The execution of the experiment might take a long time. Therefore, we provide another script called
 ```
 run_random.sh
 ```
-which executes the reported approaches in Figure 5 of the paper for a randomly chosen benchmark. The result will be copied to `output.csv`.
+which executes the reported approaches in the ASE paper for a randomly chosen benchmark. The result will be copied to `output.csv`.
 
 ## General Usage:
 The engine can analyze programs written in the [C*](https://github.com/cksystemsteaching/selfie) programming language. You can see the available benchmarks in `benchmarks` folder. For more information about C* refer to https://github.com/cksystemsteaching/selfie.
