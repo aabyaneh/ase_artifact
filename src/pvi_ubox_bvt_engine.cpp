@@ -3,7 +3,7 @@
 // ------------------------------ INITIALIZATION -------------------------------
 
 pvi_ubox_bvt_engine::pvi_ubox_bvt_engine() {
-  
+
 }
 
 pvi_ubox_bvt_engine::pvi_ubox_bvt_engine(uint64_t max_trace_length, uint64_t max_number_of_intervals, uint64_t max_number_of_involved_inputs) {
@@ -17,6 +17,9 @@ pvi_ubox_bvt_engine::pvi_ubox_bvt_engine(uint64_t max_trace_length, uint64_t max
     MAX_NUM_OF_INVOLVED_INPUTS = max_number_of_involved_inputs;
 }
 
+//
+// initializes the engine and the data-structures.
+//
 void pvi_ubox_bvt_engine::init_engine(uint64_t peek_argument) {
   which_observation = peek_argument != -1 ? peek_argument : which_observation;
 
@@ -27,6 +30,9 @@ void pvi_ubox_bvt_engine::init_engine(uint64_t peek_argument) {
   pvi_bvt_engine::init_engine(peek_argument);
 }
 
+//
+// prints witnesses at end-points.
+//
 void pvi_ubox_bvt_engine::witness_profile() {
   if (IS_PRINT_INPUT_WITNESSES_AT_ENDPOINT == false)
     return;
@@ -42,6 +48,9 @@ void pvi_ubox_bvt_engine::witness_profile() {
   }
 }
 
+//
+// prints the symbolic execution information (profile).
+//
 void print_execution_info(uint64_t paths, uint64_t total_number_of_generated_witnesses_for_all_paths, uint64_t max_number_of_generated_witnesses_among_all_paths, uint64_t queries_reasoned_by_mit, uint64_t queries_reasoned_by_box, uint64_t queries_reasoned_by_bvt, bool is_number_of_generated_witnesses_overflowed, uint8_t which_observation) {
   std::cout << "\n";
   std::cout << YELLOW "method:= ASE(O" << (uint64_t)which_observation << ")" << RESET << std::endl;
@@ -49,6 +58,10 @@ void print_execution_info(uint64_t paths, uint64_t total_number_of_generated_wit
   std::cout << GREEN "number of queries reached to the SMT solver:= " << queries_reasoned_by_bvt << RESET << "\n\n";
 }
 
+//
+// driver for running the engine:
+// execution of instructions, backtracking
+//
 uint64_t pvi_ubox_bvt_engine::run_engine(uint64_t* to_context) {
   registers = get_regs(to_context);
   pt        = get_pt(to_context);
@@ -104,6 +117,9 @@ uint64_t pvi_ubox_bvt_engine::run_engine(uint64_t* to_context) {
 // ------------------------ reasoning/decision core ----------------------------
 // -----------------------------------------------------------------------------
 
+//
+// adds an AST entry to the AST trace.
+//
 uint64_t pvi_ubox_bvt_engine::add_ast_node(uint8_t typ, uint64_t left_node, uint64_t right_node, uint32_t mints_num, std::vector<uint64_t>& lo, std::vector<uint64_t>& up, uint64_t step, uint64_t sym_input_num, std::vector<uint64_t>& sym_input_ast_tcs, uint8_t theory_type, BoolectorNode* smt_expr) {
   ast_trace_cnt++;
 
@@ -162,6 +178,9 @@ uint64_t pvi_ubox_bvt_engine::add_ast_node(uint8_t typ, uint64_t left_node, uint
   return ast_trace_cnt;
 }
 
+//
+// evaluates the sltu operation using the three layer abstraction approach: precise value interval, under-approximating box, bit-vector.
+//
 void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, std::vector<uint64_t>& up1_p, std::vector<uint64_t>& lo2_p, std::vector<uint64_t>& up2_p, uint64_t trb, bool cannot_handle) {
   bool handle_by_bvt   = cannot_handle;
   bool true_reachable  = false;
@@ -215,7 +234,7 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
           dump_all_input_variables_on_trace_true_branch_bvt();
           take_branch(1, 1);
           asts[tc-2]               = 0; // important for backtracking
-          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           // true
           boolector_push(btor, 1);
@@ -229,7 +248,7 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
           dump_all_input_variables_on_trace_false_branch_bvt();
           take_branch(0, 1);
           asts[tc-2]               = 0; // important for backtracking
-          bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]); // carefull
+          bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           // true
           boolector_push(btor, 1);
@@ -275,7 +294,7 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
         uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, MIT, boolector_null);
         take_branch(1, 1);
         asts[tc-2]               = false_ast_ptr;
-        bvt_false_branches[tc-2] = boolector_null; // careful
+        bvt_false_branches[tc-2] = boolector_null;
 
         path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, MIT, boolector_null));
 
@@ -292,7 +311,7 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
         uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, MIT, boolector_null);
         take_branch(0, 1);
         asts[tc-2]               = false_ast_ptr;
-        bvt_false_branches[tc-2] = boolector_null; // careful
+        bvt_false_branches[tc-2] = boolector_null;
 
         path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, MIT, boolector_null));
 
@@ -317,6 +336,9 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
   }
 }
 
+//
+// evaluates the disequality operation using the three layer abstraction approach: precise value interval, under-approximating box, bit-vector.
+//
 void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, std::vector<uint64_t>& up1_p, std::vector<uint64_t>& lo2_p, std::vector<uint64_t>& up2_p, uint64_t trb, bool cannot_handle) {
   bool handle_by_bvt   = cannot_handle;
   bool true_reachable  = false;
@@ -371,7 +393,7 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
           dump_all_input_variables_on_trace_true_branch_bvt();
           take_branch(1, 1);
           asts[tc-2]               = 0; // important for backtracking
-          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]); // carefull
+          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           // true
           boolector_push(btor, 1);
@@ -385,7 +407,7 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
           dump_all_input_variables_on_trace_false_branch_bvt();
           take_branch(0, 1);
           asts[tc-2]               = 0; // important for backtracking
-          bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]); // carefull
+          bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           // true
           boolector_push(btor, 1);
@@ -431,7 +453,7 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
         uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, MIT, boolector_null);
         take_branch(1, 1);
         asts[tc-2]               = false_ast_ptr;
-        bvt_false_branches[tc-2] = boolector_null; // careful
+        bvt_false_branches[tc-2] = boolector_null;
 
         path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, MIT, boolector_null));
 
@@ -448,7 +470,7 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
         uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, MIT, boolector_null);
         take_branch(0, 1);
         asts[tc-2]               = false_ast_ptr;
-        bvt_false_branches[tc-2] = boolector_null; // carful
+        bvt_false_branches[tc-2] = boolector_null;
 
         path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, MIT, boolector_null));
 
@@ -477,12 +499,18 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
 // ------------------- under_approximate decision procedure --------------------
 // -----------------------------------------------------------------------------
 
+//
+// constrains memory location with respect to the under-approximating box abstraction.
+//
 void pvi_ubox_bvt_engine::constrain_memory_under_approximate_box(uint64_t reg, uint64_t ast_tc, std::vector<uint64_t>& lo, std::vector<uint64_t>& up, size_t mints_num, uint64_t input_box) {
   if (reg_symb_type[reg] == SYMBOLIC) {
     backward_propagation_of_under_approximate_box(ast_tc, lo, up, mints_num, input_box);
   }
 }
 
+//
+// performs backward propagation of value intervals with respect to the under-approximating box abstraction.
+//
 uint64_t pvi_ubox_bvt_engine::backward_propagation_of_under_approximate_box(uint64_t ast_tc, std::vector<uint64_t>& lo, std::vector<uint64_t>& up, size_t mints_num, uint64_t input_box) {
   uint8_t  left_or_right_is_sym;
   uint64_t ast_ptr;
@@ -504,7 +532,7 @@ uint64_t pvi_ubox_bvt_engine::backward_propagation_of_under_approximate_box(uint
 
   if (ast_nodes[ast_tc].type == VAR) {
     ast_ptr = add_ast_node(VAR, 0, ast_nodes[ast_tc].right_node, mints_num, propagated_minterval_lo, propagated_minterval_up, steps[ast_tc], 0, zero_v, BOX, smt_exprs[ast_tc]);
-    boxes[ast_trace_cnt] = input_box; // careful
+    boxes[ast_trace_cnt] = input_box;
 
     for (size_t i = 0; i < store_trace_ptrs[ast_tc].size(); i++) {
       stored_to_tc    = store_trace_ptrs[ast_tc][i];
@@ -585,7 +613,7 @@ uint64_t pvi_ubox_bvt_engine::backward_propagation_of_under_approximate_box(uint
   else
     ast_ptr = add_ast_node(ast_nodes[ast_tc].type, ast_nodes[ast_tc].left_node, sym_operand_ptr, mints_num, saved_lo, saved_up, steps[ast_tc], involved_sym_inputs_cnts[sym_operand_ptr], involved_sym_inputs_ast_tcs[sym_operand_ptr], BOX, smt_exprs[ast_tc]);
 
-  boxes[ast_trace_cnt] = input_box; // careful
+  boxes[ast_trace_cnt] = input_box;
 
   for (size_t i = 0; i < store_trace_ptrs[ast_tc].size(); i++) {
     stored_to_tc    = store_trace_ptrs[ast_tc][i];
@@ -599,6 +627,9 @@ uint64_t pvi_ubox_bvt_engine::backward_propagation_of_under_approximate_box(uint
   return ast_ptr;
 }
 
+//
+// heuristic 'h2' for generation and application of the operands' under-approximating boxes for the true branch of the sltu operation.
+//
 void pvi_ubox_bvt_engine::evaluate_sltu_true_branch_under_approximate_box_h2(uint64_t lo1, uint64_t up1, uint64_t lo2, uint64_t up2) {
   // std::cout << "-- evaluate_sltu_true_branch_under_approximate_box_h2 -- \n";
 
@@ -606,13 +637,13 @@ void pvi_ubox_bvt_engine::evaluate_sltu_true_branch_under_approximate_box_h2(uin
   if (lo1 >= lo2) {
     true_branch_rs1_minterval_los[0] = lo1;
     true_branch_rs1_minterval_ups[0] = lo1;
-    true_branch_rs2_minterval_los[0] = lo1+1; // no problem
+    true_branch_rs2_minterval_los[0] = lo1+1;
     true_branch_rs2_minterval_ups[0] = up2;
 
     // std::cout << "box1: [" << lo1 << ", " << lo1 << "]; [" << lo1+1 << ", " << up2 << "]\n";
   } else {
     true_branch_rs1_minterval_los[0] = lo1;
-    true_branch_rs1_minterval_ups[0] = lo2-1; // no problem
+    true_branch_rs1_minterval_ups[0] = lo2-1;
     true_branch_rs2_minterval_los[0] = lo2;
     true_branch_rs2_minterval_ups[0] = up2;
 
@@ -640,12 +671,15 @@ void pvi_ubox_bvt_engine::evaluate_sltu_true_branch_under_approximate_box_h2(uin
   constrain_memory_under_approximate_box(rs2, reg_asts[rs2], true_branch_rs2_minterval_los, true_branch_rs2_minterval_ups, 2, involved_sym_inputs_ast_tcs[reg_asts[rs1]][0]);
 }
 
+//
+// heuristic 'h2' for generation and application of the operands' under-approximating boxes for the false branch of the sltu operation.
+//
 void pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h2(uint64_t lo1, uint64_t up1, uint64_t lo2, uint64_t up2) {
   // std::cout << "-- evaluate_sltu_false_branch_under_approximate_box_h2 -- \n";
 
   // box1: priority >= .
   if (lo1 <= lo2) {
-    false_branch_rs1_minterval_los[0] = lo2; // no problem
+    false_branch_rs1_minterval_los[0] = lo2;
     false_branch_rs1_minterval_ups[0] = up1;
     false_branch_rs2_minterval_los[0] = lo2;
     false_branch_rs2_minterval_ups[0] = lo2;
@@ -655,7 +689,7 @@ void pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h2(ui
     false_branch_rs1_minterval_los[0] = lo1;
     false_branch_rs1_minterval_ups[0] = up1;
     false_branch_rs2_minterval_los[0] = lo2;
-    false_branch_rs2_minterval_ups[0] = lo1; // no problem
+    false_branch_rs2_minterval_ups[0] = lo1;
 
     // std::cout << "box1: [" << lo1 << ", " << up1 << "]; [" << lo2 << ", " << lo1 << "]\n";
   }
@@ -665,7 +699,7 @@ void pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h2(ui
     false_branch_rs1_minterval_los[1] = up1;
     false_branch_rs1_minterval_ups[1] = up1;
     false_branch_rs2_minterval_los[1] = lo2;
-    false_branch_rs2_minterval_ups[1] = up1; // no problem
+    false_branch_rs2_minterval_ups[1] = up1;
 
     // std::cout << "box2: [" << up1 << ", " << up1 << "]; [" << lo2 << ", " << up1 << "]\n";
   } else {
@@ -681,6 +715,9 @@ void pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h2(ui
   constrain_memory_under_approximate_box(rs2, reg_asts[rs2], false_branch_rs2_minterval_los, false_branch_rs2_minterval_ups, 2, involved_sym_inputs_ast_tcs[reg_asts[rs1]][0]);
 }
 
+//
+// heuristic 'h3' for generation and application of the operands' under-approximating boxes for the true branch of the sltu operation.
+//
 bool pvi_ubox_bvt_engine::evaluate_sltu_true_branch_under_approximate_box_h3(uint64_t lo1, uint64_t up1, uint64_t lo2, uint64_t up2) {
   // std::cout << "-- evaluate_sltu_true_branch_under_approximate_box_h3 -- \n";
 
@@ -706,6 +743,9 @@ bool pvi_ubox_bvt_engine::evaluate_sltu_true_branch_under_approximate_box_h3(uin
   return true;
 }
 
+//
+// heuristic 'h3' for generation and application of the operands' under-approximating boxes for the false branch of the sltu operation.
+//
 bool pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h3(uint64_t lo1, uint64_t up1, uint64_t lo2, uint64_t up2) {
   // std::cout << "-- evaluate_sltu_false_branch_under_approximate_box_h3 -- \n";
 
@@ -731,6 +771,9 @@ bool pvi_ubox_bvt_engine::evaluate_sltu_false_branch_under_approximate_box_h3(ui
   return true;
 }
 
+//
+// chooses one of the candidate boxes.
+//
 void pvi_ubox_bvt_engine::choose_best_local_choice_between_boxes(size_t index_true_i, size_t index_true_j) {
   uint64_t ast_ptr, involved_input, related_input, stored_to_tc, mr_stored_to_tc;
   bool is_assigned;
@@ -791,7 +834,7 @@ void pvi_ubox_bvt_engine::generate_and_apply_sltu_boxes_h2(uint8_t conditional_t
     uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(1, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -802,7 +845,7 @@ void pvi_ubox_bvt_engine::generate_and_apply_sltu_boxes_h2(uint8_t conditional_t
     uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(0, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -822,7 +865,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_sltu_boxes_h3(uint8_t conditional_t
     uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(1, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -837,7 +880,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_sltu_boxes_h3(uint8_t conditional_t
     uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(0, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -1772,6 +1815,9 @@ uint8_t pvi_ubox_bvt_engine::sltu_box_decision_heuristic_3(uint8_t conditional_t
   return CAN_BE_HANDLED;
 }
 
+//
+// evaluates the sltu operation based on the under-approximating decision procedure using heuristic 'h2'.
+//
 bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2(std::vector<uint64_t>& lo1, std::vector<uint64_t>& up1, std::vector<uint64_t>& lo2, std::vector<uint64_t>& up2) {
   bool true_reachable  = false;
   bool false_reachable = false;
@@ -1836,7 +1882,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
           uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -1849,7 +1895,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
           uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -1874,7 +1920,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
             uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
             take_branch(1, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_null; // careful
+            bvt_false_branches[tc-2] = boolector_null;
 
             restore_input_table_to_before_applying_bvt_dumps();
 
@@ -1892,12 +1938,11 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
             uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
             take_branch(0, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+            bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
             path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
             // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-            // so no worries
 
             // very important: restore input table,
             // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -1933,12 +1978,11 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
           uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
           // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-          // so no worries
 
           // very important: restore input table,
           // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -1957,7 +2001,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
           uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           restore_input_table_to_before_applying_bvt_dumps();
 
@@ -1985,6 +2029,9 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h2
   }
 }
 
+//
+// evaluates the sltu operation based on the under-approximating decision procedure using heuristic 'h3'.
+//
 bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3(std::vector<uint64_t>& lo1, std::vector<uint64_t>& up1, std::vector<uint64_t>& lo2, std::vector<uint64_t>& up2) {
   bool true_reachable  = false;
   bool false_reachable = false;
@@ -2047,7 +2094,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
           uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -2060,7 +2107,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
           uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -2085,7 +2132,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
             uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
             take_branch(1, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_null; // careful
+            bvt_false_branches[tc-2] = boolector_null;
 
             restore_input_table_to_before_applying_bvt_dumps();
 
@@ -2103,12 +2150,11 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
             uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
             take_branch(0, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+            bvt_false_branches[tc-2] = boolector_ugte(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
             path_condition.push_back(add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
             // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-            // so no worries
 
             // very important: restore input table,
             // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -2144,12 +2190,11 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
           uint64_t false_ast_ptr   = add_ast_node(ILT, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+          bvt_false_branches[tc-2] = boolector_ult(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           path_condition.push_back(add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
           // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-          // so no worries
 
           // very important: restore input table,
           // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -2168,7 +2213,7 @@ bool pvi_ubox_bvt_engine::apply_sltu_under_approximate_box_decision_procedure_h3
           uint64_t false_ast_ptr   = add_ast_node(IGTE, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           restore_input_table_to_before_applying_bvt_dumps();
 
@@ -3125,7 +3170,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_diseq_boxes_h2(uint8_t conditional_
     uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(1, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3141,7 +3186,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_diseq_boxes_h2(uint8_t conditional_
     uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(0, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3161,7 +3206,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_diseq_boxes_h3(uint8_t conditional_
     uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(1, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3177,7 +3222,7 @@ bool pvi_ubox_bvt_engine::generate_and_apply_diseq_boxes_h3(uint8_t conditional_
     uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
     take_branch(0, 1);
     asts[tc-2]               = false_ast_ptr;
-    bvt_false_branches[tc-2] = boolector_null; // careful
+    bvt_false_branches[tc-2] = boolector_null;
 
     path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3190,6 +3235,9 @@ bool pvi_ubox_bvt_engine::generate_and_apply_diseq_boxes_h3(uint8_t conditional_
   return true;
 }
 
+//
+// evaluates the disequality operation based on the under-approximating decision procedure using heuristic 'h2'.
+//
 bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h2(std::vector<uint64_t>& lo1, std::vector<uint64_t>& up1, std::vector<uint64_t>& lo2, std::vector<uint64_t>& up2) {
   bool true_reachable  = false;
   bool false_reachable = false;
@@ -3252,7 +3300,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3265,7 +3313,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3289,7 +3337,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
             uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
             take_branch(1, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_null; // careful
+            bvt_false_branches[tc-2] = boolector_null;
 
             restore_input_table_to_before_applying_bvt_dumps();
 
@@ -3307,12 +3355,11 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
             uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
             take_branch(0, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+            bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
             path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
             // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-            // so no worries
 
             // very important: restore input table,
             // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -3348,7 +3395,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]); // carefull
+          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3368,7 +3415,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           restore_input_table_to_before_applying_bvt_dumps();
 
@@ -3396,6 +3443,9 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
   }
 }
 
+//
+// evaluates the disequality operation based on the under-approximating decision procedure using heuristic 'h3'.
+//
 bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h3(std::vector<uint64_t>& lo1, std::vector<uint64_t>& up1, std::vector<uint64_t>& lo2, std::vector<uint64_t>& up2) {
   bool true_reachable  = false;
   bool false_reachable = false;
@@ -3455,7 +3505,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3468,7 +3518,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null);
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3492,7 +3542,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
             uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
             take_branch(1, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_null; // careful
+            bvt_false_branches[tc-2] = boolector_null;
 
             restore_input_table_to_before_applying_bvt_dumps();
 
@@ -3510,12 +3560,11 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
             uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
             take_branch(0, 1);
             asts[tc-2]               = false_ast_ptr;
-            bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]); // careful
+            bvt_false_branches[tc-2] = boolector_eq(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
             path_condition.push_back(add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
             // important: if on true branch we need BVT in future it will apply boolector_push() later in assert_path_condition_into_smt_expression
-            // so no worries
 
             // very important: restore input table,
             // dump_involving_input_variables_true_branch_bvt, dump_all_input_variables_on_trace_true_branch_bvt
@@ -3551,7 +3600,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(INEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BOX, boolector_null); // important: should remain BOX
           take_branch(1, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]); // carefull
+          bvt_false_branches[tc-2] = boolector_ne(btor, reg_bvts[rs1], reg_bvts[rs2]);
 
           path_condition.push_back(add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 1, 0, zero_v, BOX, boolector_null));
 
@@ -3571,7 +3620,7 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
           uint64_t false_ast_ptr   = add_ast_node(IEQ, reg_asts[rs1], reg_asts[rs2], 0, zero_v, zero_v, 0, 0, zero_v, BVT, boolector_null); // important should be BVT so that in backtrack_sltu it does boolector_pop
           take_branch(0, 1);
           asts[tc-2]               = false_ast_ptr;
-          bvt_false_branches[tc-2] = boolector_null; // careful
+          bvt_false_branches[tc-2] = boolector_null;
 
           restore_input_table_to_before_applying_bvt_dumps();
 
@@ -3599,6 +3648,9 @@ bool pvi_ubox_bvt_engine::apply_diseq_under_approximate_box_decision_procedure_h
   }
 }
 
+//
+// generation and application of the operands' under-approximating boxes for the false branch of the disequality operation.
+//
 bool pvi_ubox_bvt_engine::evaluate_diseq_false_branch_under_approximate_box(uint64_t lo1, uint64_t up1, uint64_t lo2, uint64_t up2) {
   // std::cout << "-- evaluate_diseq_false_branch_under_approximate_box -- \n";
 
