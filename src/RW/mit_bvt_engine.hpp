@@ -3,7 +3,7 @@
 class mit_bvt_engine : public engine {
   public:
     mit_bvt_engine();
-    mit_bvt_engine(uint64_t, uint64_t, uint64_t);
+    mit_bvt_engine(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 
     // extra syscalls
     uint64_t SYSCALL_SYMPOLIC_INPUT = 42;

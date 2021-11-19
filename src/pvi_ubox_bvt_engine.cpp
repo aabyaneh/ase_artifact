@@ -6,15 +6,13 @@ pvi_ubox_bvt_engine::pvi_ubox_bvt_engine() {
 
 }
 
-pvi_ubox_bvt_engine::pvi_ubox_bvt_engine(uint64_t max_trace_length, uint64_t max_number_of_intervals, uint64_t max_number_of_involved_inputs) {
-  if (max_trace_length > MAX_TRACE_LENGTH)
-    MAX_TRACE_LENGTH = max_trace_length;
-
-  if (max_number_of_intervals > MAX_NUM_OF_INTERVALS)
-    MAX_NUM_OF_INTERVALS = max_number_of_intervals;
-
-  if (max_number_of_involved_inputs > MAX_NUM_OF_INVOLVED_INPUTS)
-    MAX_NUM_OF_INVOLVED_INPUTS = max_number_of_involved_inputs;
+pvi_ubox_bvt_engine::pvi_ubox_bvt_engine(uint64_t max_trace_length, uint64_t max_number_of_intervals, uint64_t max_number_of_involved_inputs, uint64_t max_ast_nodes_trace_length, uint64_t initial_ast_nodes_trace_length, uint64_t memory_allocation_step_ast_nodes_trace) {
+  MAX_TRACE_LENGTH = max_trace_length;
+  MAX_NUM_OF_INTERVALS = max_number_of_intervals;
+  MAX_NUM_OF_INVOLVED_INPUTS = max_number_of_involved_inputs;
+  MAX_AST_NODES_TRACE_LENGTH = max_ast_nodes_trace_length;
+  AST_NODES_TRACE_LENGTH = initial_ast_nodes_trace_length;
+  MEMORY_ALLOCATION_STEP_AST_NODES_TRACE = memory_allocation_step_ast_nodes_trace;
 }
 
 //
@@ -198,14 +196,45 @@ void pvi_ubox_bvt_engine::create_sltu_constraints(std::vector<uint64_t>& lo1_p, 
   if (reg_theory_types[rs1] > MIT || reg_theory_types[rs2] > MIT) {
     cannot_handle = true;
   } else if (cannot_handle != true) {
-    for (size_t i = 0; i < reg_mintervals_cnts[rs1]; i++) {
-      lo1 = lo1_p[i];
-      up1 = up1_p[i];
-      for (size_t j = 0; j < reg_mintervals_cnts[rs2]; j++) {
-        lo2 = lo2_p[j];
-        up2 = up2_p[j];
-        cannot_handle = evaluate_sltu_true_false_branch_mit(lo1, up1, lo2, up2);
+    if (reg_mintervals_cnts[rs1] == 1 && reg_mintervals_cnts[rs2] == 1) {
+      lo1 = lo1_p[0];
+      up1 = up1_p[0];
+      lo2 = lo2_p[0];
+      up2 = up2_p[0];
+      cannot_handle = evaluate_sltu_true_false_branch_mit(lo1, up1, lo2, up2);
+
+    } else if (reg_mintervals_cnts[rs1] > 1 && reg_mintervals_cnts[rs2] == 1) {
+      lo2 = lo2_p[0];
+      up2 = up2_p[0];
+      if (lo2 == up2) {
+        for (size_t i = 0; i < reg_mintervals_cnts[rs1]; i++) {
+          lo1 = lo1_p[i];
+          up1 = up1_p[i];
+          cannot_handle = evaluate_sltu_true_false_branch_mit(lo1, up1, lo2, up2);
+          if (cannot_handle == true)
+            break;
+        }
+      } else {
+        cannot_handle = true;
       }
+
+    } else if (reg_mintervals_cnts[rs1] == 1 && reg_mintervals_cnts[rs2] > 1) {
+      lo1 = lo1_p[0];
+      up1 = up1_p[0];
+      if (lo1 == up1) {
+        for (size_t j = 0; j < reg_mintervals_cnts[rs2]; j++) {
+          lo2 = lo2_p[j];
+          up2 = up2_p[j];
+          cannot_handle = evaluate_sltu_true_false_branch_mit(lo1, up1, lo2, up2);
+          if (cannot_handle == true)
+            break;
+        }
+      } else {
+        cannot_handle = true;
+      }
+
+    } else {
+      cannot_handle = true;
     }
   }
 
@@ -356,14 +385,43 @@ void pvi_ubox_bvt_engine::create_xor_constraints(std::vector<uint64_t>& lo1_p, s
   if (reg_theory_types[rs1] > MIT || reg_theory_types[rs2] > MIT) {
     cannot_handle = true;
   } else if (cannot_handle != true) {
-    for (size_t i = 0; i < reg_mintervals_cnts[rs1]; i++) {
-      lo1 = lo1_p[i];
-      up1 = up1_p[i];
-      for (size_t j = 0; j < reg_mintervals_cnts[rs2]; j++) {
-        lo2 = lo2_p[j];
-        up2 = up2_p[j];
-        cannot_handle = evaluate_xor_true_false_branch_mit(lo1, up1, lo2, up2);
+    if (reg_mintervals_cnts[rs1] == 1 && reg_mintervals_cnts[rs2] == 1) {
+      lo1 = lo1_p[0];
+      up1 = up1_p[0];
+      lo2 = lo2_p[0];
+      up2 = up2_p[0];
+      cannot_handle = evaluate_xor_true_false_branch_mit(lo1, up1, lo2, up2);
+
+    } else if (reg_mintervals_cnts[rs1] > 1 && reg_mintervals_cnts[rs2] == 1) {
+      lo2 = lo2_p[0];
+      up2 = up2_p[0];
+      if (lo2 == up2) {
+        for (size_t i = 0; i < reg_mintervals_cnts[rs1]; i++) {
+          lo1 = lo1_p[i];
+          up1 = up1_p[i];
+          cannot_handle = evaluate_xor_true_false_branch_mit(lo1, up1, lo2, up2);
+          if (cannot_handle == true)
+            break;
+        }
+      } else {
+        cannot_handle = true;
       }
+    } else if (reg_mintervals_cnts[rs1] == 1 && reg_mintervals_cnts[rs2] > 1) {
+      lo1 = lo1_p[0];
+      up1 = up1_p[0];
+      if (lo1 == up1) {
+        for (size_t j = 0; j < reg_mintervals_cnts[rs2]; j++) {
+          lo2 = lo2_p[j];
+          up2 = up2_p[j];
+          cannot_handle = evaluate_xor_true_false_branch_mit(lo1, up1, lo2, up2);
+          if (cannot_handle == true)
+            break;
+        }
+      } else {
+        cannot_handle = true;
+      }
+    } else {
+      cannot_handle = true;
     }
   }
 

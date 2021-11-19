@@ -239,7 +239,7 @@ int main(int argc, char* argv[]) {
     }
     else if (!strcmp(option, "-pvi_bvt")) {
       method_name = "pvi_bvt";
-      current_engine = new pvi_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs);
+      current_engine = new pvi_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs, max_ast_nodes_trace_length, initial_ast_nodes_trace_length, memory_allocation_step_ast_nodes_trace);
       current_engine->exe_name = exe_name;
       current_engine->init_engine(running_arg);
       current_engine->selfie_load(load_file_name);
@@ -263,7 +263,7 @@ int main(int argc, char* argv[]) {
       method_name = "ASE (O";
       method_name.append((running_arg == 1 ? "1" : "2"));
       method_name.append(")");
-      current_engine = new pvi_ubox_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs);
+      current_engine = new pvi_ubox_bvt_engine(max_trace_length, max_number_of_intervals, max_number_of_involved_inputs, max_ast_nodes_trace_length, initial_ast_nodes_trace_length, memory_allocation_step_ast_nodes_trace);
       current_engine->exe_name = exe_name;
       current_engine->init_engine(running_arg);
       current_engine->selfie_load(load_file_name);

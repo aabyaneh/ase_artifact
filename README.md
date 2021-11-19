@@ -133,6 +133,10 @@ You can run the following command to execute the program symbolically:
 To run the engine on very large input programs you may need to increase the configuration parameters in `ase.hpp` and `se.hpp` files of the source code and then rebuild the source code:
 
 - max_trace_length: the maximum length of the trace used by the engine.
+- max_ast_nodes_trace_length: the maximum length of the AST (Abstract Syntax Tree) nodes trace.
+- initial_ast_nodes_trace_length: the initial length of the AST nodes trace.
 - max_number_of_intervals: the maximum number of value intervals used to represent the set of values for a variable.
+- max_number_of_involved_inputs: the maximum number of involved input values in a variable.
+- memory_allocation_step_ast_nodes_trace: the memory allocation step for AST nodes trace.
 
 To reproduce the results of the paper you do not need to change these configuration parameters.

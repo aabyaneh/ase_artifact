@@ -21,6 +21,9 @@ int    _argc    = 0;
 char** _argv    = (char**) 0;
 char*  exe_name = (char*) 0;
 
-uint64_t max_trace_length              = 20000000;
-uint64_t max_number_of_intervals       = 2001;
-uint64_t max_number_of_involved_inputs = 100;
+uint64_t max_trace_length               = 20000000;
+uint64_t max_ast_nodes_trace_length     = 10 * max_trace_length;
+uint64_t initial_ast_nodes_trace_length = max_ast_nodes_trace_length / 8;
+uint64_t max_number_of_intervals        = 2001;
+uint64_t max_number_of_involved_inputs  = 100;
+uint64_t memory_allocation_step_ast_nodes_trace = 10000000;

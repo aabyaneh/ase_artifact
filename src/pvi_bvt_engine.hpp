@@ -3,7 +3,7 @@
 class pvi_bvt_engine : public engine {
   public:
     pvi_bvt_engine();
-    pvi_bvt_engine(uint64_t, uint64_t, uint64_t);
+    pvi_bvt_engine(uint64_t, uint64_t, uint64_t, uint64_t, uint64_t, uint64_t);
 
     // extra syscalls
     uint64_t SYSCALL_SYMPOLIC_INPUT = 42;
